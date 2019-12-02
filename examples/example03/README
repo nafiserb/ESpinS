@@ -1,0 +1,67 @@
+# The results of this example can be compared by results in the follwoing paper: 
+#"Spin Hamiltonian, order out of a Coulomb phase, and pseudocriticality 
+# in the frustrated pyrochlore Heisenberg antiferromagnet FeF3", Phys. Rev. B 91, 140407(R) 
+
+1) run 
+   mc.x -inp1 fef3
+2) add Jij,  Bij and Dij value in Parameters_Jij, Parameters_Bij and Parameters_Dij
+blocks of fef3.inp2.mcin file:
+   
+  Begin Parameters_Jij
+   t1=  1:t2=  1:sh= 1:Jij=-0.032700!:sig=?????!:d= 3.65043876
+  End Parameters_Jij
+  
+  Begin Parameters_Bij
+   t1=  1:t2=  1:sh= 1:Bij= 0.001000!:d= 3.65043876
+  End Parameters_Bij
+  
+  Begin Parameters_Dij
+   t1=  1:t2=  1:sh= 1:Dij= 0.000600!:d= 3.65043876
+  End Parameters_Dij
+
+3) Uncomment any other parameters that you want to be calculated in monte carlo simulations 
+   in this example uncomment these parameters (Order_parameter)
+4) run 
+   mc.x -inp2 fef3
+5) edit temperatures, supercell size according to what you want in fef3.mcin file
+
+6) Replace the block of Dij vectors by:
+
+  Begin Dij_Vectors_Cart
+   -1.000000     1.000000    -0.000000
+   -0.000000    -1.000000     1.000000
+    1.000000    -0.000000    -1.000000
+   -1.000000     1.000000    -0.000000
+   -0.000000    -1.000000     1.000000
+    1.000000    -0.000000    -1.000000
+    1.000000    -1.000000    -0.000000
+   -1.000000    -0.000000    -1.000000
+   -0.000000     1.000000     1.000000
+    1.000000    -1.000000    -0.000000
+   -1.000000    -0.000000    -1.000000
+   -0.000000     1.000000     1.000000
+   -0.000000     1.000000    -1.000000
+    1.000000    -0.000000     1.000000
+   -1.000000    -1.000000    -0.000000
+   -0.000000     1.000000    -1.000000
+    1.000000    -0.000000     1.000000
+   -1.000000    -1.000000    -0.000000
+   -1.000000    -0.000000     1.000000
+   -0.000000    -1.000000    -1.000000
+    1.000000     1.000000    -0.000000
+   -1.000000    -0.000000     1.000000
+   -0.000000    -1.000000    -1.000000
+    1.000000     1.000000    -0.000000
+  End Dij_Vectors_Cart
+
+7) Reokace the block of order parameter axes by:
+
+ Begin order_parameter_axes_cart
+   Fe   1.290625  1.290625  1.290625
+   Fe  -1.290625 -1.290625  1.290625
+   Fe   1.290625 -1.290625 -1.290625
+   Fe  -1.290625  1.290625 -1.290625
+ End order_parameter_axes_cart
+
+8) run
+   mc.x fef3

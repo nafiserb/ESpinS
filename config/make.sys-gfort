@@ -1,0 +1,16 @@
+
+#=============                                            
+# For Linux                                           
+#=============                                             
+F90 = gfortran
+#COMMS=mpi
+#MPIF90=mpifort
+FCOPTS=-O2 
+LDOPTS=-O2 
+#========================================================
+# Intel mkl libraries. Set LIBPATH if not in default path
+#========================================================
+
+#LIBDIR = /home/nrezaei/softs/lib
+#LIBS = -L$(LIBDIR) -llapack -lblas
+LIBS =  -llapack -lblas

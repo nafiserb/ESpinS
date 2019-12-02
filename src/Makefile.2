@@ -1,0 +1,105 @@
+#  Should be no need to change below this line
+#
+
+include ../../make.sys
+
+OBJS  = stdtypes.o mtprng.o constants.o io.o comms.o utility.o parameters.o neighbors.o ham.o jij.o bij.o dij.o get_quant.o mcarlo.o pt.o common.o 
+
+ifdef COMMS
+COMMS := $(strip $(COMMS))
+else
+COMMS = serial
+endif
+
+ifeq ($(COMMS),mpi)
+TEMP1 = -DMPI
+TEMP2 = $(MPIF90)
+else
+TEMP1 =
+TEMP2 = $(F90)
+endif
+
+mc: PTOPTS = $(TEMP1)
+#mc: COMPILER = $(TEMP2)  -g -fcheck=all -Wall -mcmodel=medium
+#mc: COMPILER = $(TEMP2)  -g -check all -fpe0 -warn -traceback -debug extended
+mc: COMPILER = $(TEMP2)  
+mc: mpi_test ../../mc.x
+
+../../mc.x: $(OBJS) ../mc_prog.F90
+	$(COMPILER) ../mc_prog.F90 $(PTOPTS) $(LDOPTS) $(OBJS) $(LIBS) -o ../../mc.x
+
+
+mpi_test :
+ifeq ($(COMMS),mpi)
+
+ifndef MPIF90
+
+	$(info  ) \
+	$(info ********************* STOP **********************) \
+	$(info *  COMMS=mpi but MPIF90 is not set in make.sys  *) \
+	$(info *  Set MPIF90 to your parallel fortran compiler *) \
+	$(info *  On many systems MPIF90=mpif90 will work      *) \
+	$(info ********************* STOP **********************) \
+	$(info  ) \
+	$(error MPIF90 is not set) 
+
+endif
+
+endif 
+
+$(LIBRARY): $(OBJS) 
+	$(AR) $(ARFLAGS) $(LIBRARY)  $(OBJS)
+
+clean:
+	rm -f *.o *.mod *.MOD *.obj
+
+stdtypes.o: ../stdtypes.f90
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../stdtypes.f90
+
+mtprng.o: ../mtprng.f90
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../mtprng.f90
+
+
+constants.o: ../constants.F90
+	 $(COMPILER) $(PTOPTS) $(FCOPTS) -c ../constants.F90
+
+io.o: ../io.F90 constants.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../io.F90
+
+utility.o: ../utility.F90  constants.o io.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../utility.F90
+
+comms.o: ../comms.F90 constants.o io.o 
+	 $(COMPILER) $(PTOPTS) $(FCOPTS) -c ../comms.F90
+
+parameters.o: ../parameters.F90 constants.o io.o utility.o comms.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../parameters.F90
+
+neighbors.o: ../neighbors.F90 constants.o io.o utility.o parameters.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../neighbors.F90
+
+ham.o: ../ham.F90 constants.o io.o utility.o parameters.o neighbors.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../ham.F90
+
+jij.o: ../jij.F90 constants.o io.o  parameters.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../jij.F90
+
+bij.o: ../bij.F90 constants.o io.o  parameters.o jij.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../bij.F90
+
+dij.o: ../dij.F90 constants.o io.o  parameters.o jij.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../dij.F90
+
+common.o: ../common.F90 comms.o parameters.o utility.o constants.o io.o jij.o dij.o bij.o
+	 $(COMPILER) $(PTOPTS) $(FCOPTS) -c ../common.F90
+
+get_quant.o: ../get_quant.F90 jij.o dij.o bij.o constants.o io.o  parameters.o stdtypes.o mtprng.o 
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../get_quant.F90
+
+mcarlo.o: ../mcarlo.F90 jij.o dij.o bij.o constants.o io.o  parameters.o stdtypes.o mtprng.o common.o comms.o get_quant.o
+	$(COMPILER) $(PTOPTS) $(FCOPTS) -c ../mcarlo.F90
+
+pt.o: ../pt.F90 common.o comms.o parameters.o constants.o io.o jij.o dij.o bij.o stdtypes.o mtprng.o get_quant.o 
+	 $(COMPILER) $(PTOPTS) $(FCOPTS) -c ../pt.F90
+
+.PHONY: mc  pt clean serialobjs 

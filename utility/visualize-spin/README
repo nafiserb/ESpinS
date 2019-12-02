@@ -1,0 +1,16 @@
+1- To compile, type:
+  
+   make
+
+2- The input file of the program:
+    
+   2-1- seedname.xsf
+   2-2- seedname_sconfig.dat
+
+3- To run the program, type:
+
+  ./vispin.x seedname
+
+  for example:
+
+  ./vispin.x cubic

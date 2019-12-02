@@ -1,0 +1,1258 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University/School Laboratory Report
+% LaTeX Template
+% Version 3.1 (25/3/14)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Linux and Unix Users Group at Virginia Tech Wiki 
+% (https://vtluug.org/wiki/Example_LaTeX_chem_lab_report)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+%\documentclass[10pt]{article}
+\documentclass[10pt]{report}
+
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[version=3]{mhchem} % Package for chemical equation typesetting
+\usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
+\usepackage{graphicx} % Required for the inclusion of images
+\usepackage{natbib} % Required to change bibliography style to APA
+\usepackage{amsmath} % Required for some math elements 
+\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{pifont}
+\usepackage{adforn}
+\usepackage{braket}
+%\usepackage{amssymb} %
+%\usepackage{wasysym}%
+%\usepackage{adfbullets}
+%\usepackage{adfarrows}
+\usepackage{booktabs}  
+
+
+\usepackage{soul}
+\usepackage{xcolor}
+\setstcolor{red}
+\setul{}{1.5pt}
+\usepackage[normalem]{ulem}
+
+\newcommand\redsout{\bgroup\markoverwith{\textcolor{red}{\rule[0.5ex]{2pt}{1.4pt}}}\ULon}
+
+
+\setlength\parindent{2pt} % Removes all indentation from paragraphs
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+\def\la{\large}
+
+%\usepackage{times} % Uncomment to use the Times New Roman font
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{{\tt ESpin} package: \\ User Guide} % Title
+
+%\author{John \textsc{Smith}} % Author name
+\author{Nafise Rezaei, Mojtaba Alaei} % Author name
+
+\date{\today} % Date for the report
+
+\begin{document}
+
+\maketitle % Insert the title, author and date
+
+% If you wish to include an abstract, uncomment the lines below
+% \begin{abstract}
+% Abstract text
+% \end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+
+\setlength{\extrarowheight}{2pt}
+
+
+%\section{NOTES}
+\chapter{\tt ESpin}
+{\tt ESpin} is a classical Monte-Carlo simulation package for calculation of thermodynamic properties of magnetic material. It is written in Fortran 90.
+{\tt ESpin} is a free software, under the GNU General Public License.
+\paragraph{Citation}
+\paragraph{Credits}
+{\tt ESpin} was written by Nafise Rezaei (main developer) and Mojtaba Alaei.
+Some subroutines were taken from {\tt wannier90} package and were modified according to especial purposes.
+\paragraph{Notes}
+\begin{itemize} %[label=$\circ$]  
+\item {\tt ESpin} is running in both single and MPI parallel mode. 
+\item A Monte-Carlo simulation is done in three steps in {\tt ESpin}, 
+two for initialization and one for Monte-Carlo simulation.
+ Each step can be performed independently. Indeed, initializations are steps to ease the generating of the input file for the Monte-Carlo simulation.
+\item The input file is not sensetive to the uppercase and lowercase letters.
+\item Everything after $!$ or $\#$ is considered as a comment and will not be read.
+\item Logical keywords can be specified as: {\tt T} or {\tt true} or {\tt .true.}.
+\item Ordering of keywords is not important.
+\item  Each input file keyword in each step can be used in other steps without encountering any error. 
+       In fact, the program first read the keyword and if it is not relevant to the present step, the program just ignores it.
+\item The spin Hamiltonian model is as follows: \\
+$\mathcal{H}=
+\underbrace{-\frac{1}{2}\sum_{i,j}J_{ij}{\mathbf{S_i\cdot S_j}}}_\text{exchange term}+
+\underbrace{\frac{1}{2}\sum_{i,j}B_{ij}({\mathbf{S_i\cdot S_j}})^2}_\text{Biquadratic term}+
+\underbrace{\frac{1}{2}\sum_{i,j}\mathbf{D_{ij}\cdot(S_i\times~S_j)}}_\text{Dzyaloshinskii-Moriya term}+
+\underbrace{\sum_{i}\Delta_i\,\hat{\mathcal{Z}_i}\cdot\mathbf{S}_i}_\text{single-ion term}+
+\underbrace{\sum_{i}\mathbf{B}\cdot\mathbf{S}_i}_\text{magnetic field}$
+\\
+\\The exchange term is mandatory while the rest of them are optional.
+\item Keywords in the input files can be specified as follows:\\
+\begin{tabular}{lll}
+    {\tt tems$\_$num} &\tt :&\tt 1 \\
+    {\tt  tems\_num} &\tt = &\tt 1 \\
+    {\tt tems\_num} & &\tt 1
+\end{tabular}
+\item To specify some set of parameters such as atoms positions, block concept is used. 
+      The begin and end of a block are defined by {\tt begin name\_of\_block} and {\tt end name\_of\_block} respectively.
+\end{itemize}
+%\section{First initialize step}
+\chapter{Installation}
+As mentioned above,  the code is written in Fortran 90 language. 
+The code can be compiled using either Intel Fortran Compiler (IFORT) 
+or GNU Fortran compiler (GFortran)
+\footnote{Essentially the code can be compiled by any Fortran 90 compilers but the developers checked the code only using IFORT and GFortran.}
+.
+The code can be compiled by using the make tool. To set the compiler and compiler options (flags), there is a file ({\tt make.sys}) in the code  main directiory. 
+User can change the defult compiler and compiler options inside {\tt make.sys}.\\
+
+Example of  {\tt make.sys} file for IFORT compiler:
+
+{\scriptsize 
+\begin{verbatim}
+#=============                                            
+# For Linux                                           
+#=============                                             
+F90 = ifort
+COMMS=mpi
+MPIF90=mpifort
+FCOPTS=-O2 
+LDOPTS=-O2 
+#========================================================
+# Intel mkl libraries. Set LIBPATH if not in default path
+#========================================================
+
+LIBDIR = /opt/intel/mkl/lib/intel64
+LIBS   =  -L$(LIBDIR) -lmkl_core -lmkl_intel_lp64 -lmkl_sequential -lpthread
+\end{verbatim}
+}
+After setting, by typing {\tt make} command in the terminal, the code will be compiled.
+To make life easy, there is a directory ({\tt config}) which contains make.sys templates for IFORT and GFortran compilers.
+
+\chapter{Initialization}
+\section{First initialization step: {\tt inp1} step}
+\begin{center}
+\begin{tabular}{|c|p{10cm}|}
+\toprule\hline
+input file   & {\tt seedname.inp1.mcin}\\
+\hline  
+Output files & {\tt seedname.inp2.mcin, seedname.neigh, seedname.mcout, seedname.xsf}\\
+\hline
+run command  & {\tt mc.x -inp1 seedname}\\
+\hline\bottomrule
+\end{tabular}
+\end{center}
+An input file with the file extension of {\tt .inp1.mcin} is needed for this step.
+This file contains information about the unit cell, magnetic atoms positions, 
+and shell number for Hamiltonian terms. 
+In the utility directory, there is a {\tt inpfile.tem} file which is a bash file and print a sample file of 
+{\tt seedname.inp1.mcin}. Just write this command at the terminal:\\
+{\tt ./inpfile.tem}\\
+The output is:
+{\scriptsize    
+\begin{verbatim}
+ Begin  Unit_Cell_Cart
+  !Bohr
+  A_1x        A_1y       A_1z  
+  A_2x        A_2y       A_2z  
+  A_3x        A_3y       A_3z  
+ End Unit_Cell_Cart 
+
+ Begin  Atoms_Frac
+  atom_symbol  atom_pos_x  atom_pos_y  atom_pos_z  magnetic_moment  
+ End  Atoms_Frac
+ 
+ Shells_jij      = 1 
+ !! Ham_bij         = T 
+ !! Shells_bij      = 1 
+ !! Ham_dij         = T 
+ !! Shells_dij      = 1 
+
+ !! Length_unit     = Bohr
+ !! Parameter_unit  = Ryd 
+ !! Coordinate      = Cart 
+\end{verbatim}
+}
+The unit cell vectors, atoms positions, corresponding magnetic moment for each atom and shell number for Hamiltonian should be written in this file.
+\subsection{Keywords of {\tt seedname.inp1.mcin} step:}
+In the following, the keywords of {\tt seednam.inp1.mcin} are discribed:
+\begin{itemize} %[label=\lgblkcircle]
+\item {\la Unit Cell information}\\\\
+A unit cell is identified by a block which its begin and end are specified by {\tt begin unit$\_$cell$\_$cart} 
+and {\tt end unit\_cell\_cart} respectively. In this block, three vectors of the unit cell are specified in cartesian coordinate:\\\\
+{\tt begin unit\_cell\_cart} \\
+     \hspace*{0.5cm}$[${\tt units}$]$\\
+    $\hspace*{0.5cm}A_{1x}\hspace{0.3cm} A_{1y}\hspace{0.3cm} A_{1z}$ \\
+    $\hspace*{0.5cm}A_{2x}\hspace{0.3cm} A_{2y}\hspace{0.3cm} A_{2z}$ \\
+    $\hspace*{0.5cm}A_{3x}\hspace{0.3cm} A_{3y}\hspace{0.3cm} A_{3z}$ \\
+{\tt end unit\_cell\_cart} \\
+\\  {\tt units} specifies the length unit for the components of cell vectors. The options for {\tt units} are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  {\tt Ang}  (default)
+\item  {\tt bohr}
+\end{itemize}
+Writting {\tt units} is optional. If it is not present, the unit is the default value {\it i.e.} Ang.
+\item {\la Atomic Positions}\\\\         
+Position of atoms can be defined in two kinds of coordinate systems:
+\begin{center}
+    \begin{tabular}{p{0.4\linewidth}p{0.4\linewidth}}
+        \toprule
+        \multicolumn{1}{l}{\la 1) Fractinal coordinates} & \multicolumn{1}{l}{\la 2) Cartesian coordinates} \\ \midrule
+                                 & {\tt begin atoms\_cart} \\
+     %   \multirow{2}{*}{{\tt \hspace{0.2cm} $I_{sym}$\hspace{0.3cm}  $ f_x \hspace{0.2cm} f_y \hspace{0.2cm} f_z \hspace{0.3cm} \mu_I $}}
+         {\tt begin atoms\_frac} & {\tt [units]}                   \\
+       %                     & 
+        {\tt \hspace{0.2cm} $I_{sym}^{(1)}$\hspace{0.3cm}  $ f_{\textbf{A}_1}^{(1)} \hspace{0.2cm} f_{\textbf{A}_2}^{(1)} \hspace{0.2cm} f_{\textbf{A}_3}^{(1)} \hspace{0.3cm} \mu_I^{(1)} $}  &
+        {\tt \hspace{0.2cm} $I_{sym}^{(1)}$\hspace{0.3cm}  $ R_x^{(1)} \hspace{0.2cm} R_y^{(1)} \hspace{0.2cm} R_z^{(1)}\hspace{0.3cm} \mu_I^{(1)} $}  \\
+        {\tt \hspace{0.2cm} $I_{sym}^{(2)}$\hspace{0.3cm}  $ f_{\textbf{A}_1}^{(2)} \hspace{0.2cm} f_{\textbf{A}_2}^{(2)} \hspace{0.2cm} f_{\textbf{A}_3}^{(2)} \hspace{0.3cm} \mu_I^{(2)} $} & 
+        {\tt \hspace{0.2cm} $I_{sym}^{(2)}$\hspace{0.3cm}  $ R_x^{(2)} \hspace{0.2cm} R_y^{(2)} \hspace{0.2cm} R_z^{(2)}\hspace{0.3cm} \mu_I^{(2)} $}  \\
+           \hspace{0.3cm}  $\vdots$ \hspace{0.9cm}    $\vdots$ \hspace{0.45cm} $\vdots$ \hspace{0.45cm} $\vdots$ \hspace{0.55cm} $\vdots$             &   
+           \hspace{0.3cm}  $\vdots$ \hspace{0.9cm}    $\vdots$ \hspace{0.45cm} $\vdots$ \hspace{0.55cm} $\vdots$ \hspace{0.55cm} $\vdots$ \\
+        {\tt \hspace{0.2cm} $I_{sym}^{(i)}$\hspace{0.3cm}  $ f_{\textbf{A}_1}^{(i)} \hspace{0.2cm} f_{\textbf{A}_2}^{(i)} \hspace{0.2cm} f_{\textbf{A}_3}^{(i)} \hspace{0.3cm} \mu_I^{(i)} $}  &
+        {\tt \hspace{0.2cm} $I_{sym}^{(i)}$\hspace{0.3cm}  $ R_x^{(i)} \hspace{0.2cm} R_y^{(i)} \hspace{0.2cm} R_z^{(i)}\hspace{0.3cm} \mu_I^{(i)} $}  \\
+           \hspace{0.3cm}  $\vdots$ \hspace{0.9cm}    $\vdots$ \hspace{0.45cm} $\vdots$ \hspace{0.45cm} $\vdots$ \hspace{0.55cm} $\vdots$             &   
+           \hspace{0.3cm}  $\vdots$ \hspace{0.9cm}    $\vdots$ \hspace{0.45cm} $\vdots$ \hspace{0.55cm} $\vdots$ \hspace{0.55cm} $\vdots$ \\
+        {\tt end atoms\_frac}    & {\tt end atoms\_cart} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+\begin{itemize}
+\item {Fractional coordinates:}\\
+The positions of atoms are specified in {\tt atoms\_frac} block. 
+$I_{sym}^{(i)}$ indicates atomic symbol of the $i$th atom. $f_{\textbf{A}_1}^{(i)}$, $f_{\textbf{A}_2}^{(i)}$ and $f_{\textbf{A}_3}^{(i)}$ are position components of the $i$th atom 
+in fractional coordinates and $\mu_I^{(i)} $ is magnetic moment of the $i$th atom.\\
+In fractional coordinate, atomic positions are in relative coordinates of the unit cell
+vectors %as defined in block of {\tt unit\_cell\_cart}
+\footnote{The unit cell vectors are defined in block of {\tt unit\_cell\_cart} }
+{\it i.e.} $\textbf{R}^{(i)}=f_{\textbf{A}_1}^{(i)}\textbf{A}_1+f_{\textbf{A}_2}^{(i)}\textbf{A}_2+f_{\textbf{A}_3}^{(i)}\textbf{A}_3$.  \\
+\item {Cartesian coordinates:}\\
+The positions of atoms are specified in {\tt atoms\_cart} block. 
+{\tt units} is optional and determines the unit length of vector components of atomic positions in Cartesian coordinates.
+\\The options for {\tt units} are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt Ang}  (default)
+\item {\tt bohr}
+\end{itemize}
+Same as the {\tt unit\_cell\_cart} block, {\tt units} can be omitted,
+ in this case the default value is used {\it i.e.} Ang.\\
+$I_{sym}^{(i)}$ indicates atomic symbol of the $i$th atom. $R_x^{(i)}$, $R_y^{(i)}$ and $R_z^{(i)}$ are position components of the $i$th atom
+in Cartesian coordinates and $\mu_I^{(i)} $ is magnetic moment of the $i$th atom.\\
+\end{itemize}
+\item {\tt neighbors\_tol: [real]}\\
+If the distance difference between neighbor atoms of an atom is less than {\tt neighbors\_tol} Angstrom,
+they belong to the same neighbor shell.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt 0.001 Ang}.    
+\end{itemize}
+\item {\tt shells\_jij: [integer]}\\
+Shell number for exchange term of Hamiltonian.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt 1}.    
+\end{itemize}
+\item {\tt spin\_glass  : [logical]}\\
+If set to {\tt .true.}, the keywords to include spin glass in exchange parameters of Hamiltonian 
+ are written in {\tt seedname.inp2.mcin} file.
+\item {\tt ham\_bij: [logical]}\\
+If set to {\tt .true.}, Hamiltonian includes the Biquadratic term.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt .false.}.
+\end{itemize}
+\item {\tt shells\_bij: [integer]}\\
+Shell number for Biquadratic term of Hamiltonian.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  If {\tt ham\_bij = True}, the default is {\tt 1}.    
+\end{itemize}
+\item {\tt ham\_dij: [logical]} \\                   
+If set to {\tt .true.}, Hamiltonian includes the Dzyaloshinskii-Moriya interaction.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt .false.}.
+\end{itemize}
+\item {\tt shells\_dij: [integer]}\\
+Shell number for the Dzyaloshinskii-Moriya interaction in Hamiltonian.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  If {\tt ham\_dij = True}, the default is {\tt 1}.    
+\end{itemize}
+\item {\tt length\_unit: [character]}\\
+The length unit at the output files.\\
+Available options are:
+%\begin{itemize} [label=\adfhalfrightarrowhead]
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt ang} (default)
+\item {\tt bohr}        
+\end{itemize}
+\item {\tt parameter\_unit: [character]}\\
+ The energy unit of parameters in Hamiltonian at the output files.\\
+ Available options are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt ev} (default)
+\item {\tt ryd}        
+\end{itemize}
+\item {\tt coordinate: [character]}\\
+The coordinate of positions at the output files. \\
+Available options are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt frac} or {\tt fractional} (default)
+\item {\tt cart} or {\tt cartesian}      
+\end{itemize}
+\end{itemize}
+\subsection{Output files of {\tt inp1} step:}
+\begin{itemize} % [label=\adfbullet{13}]
+\item {\tt seedname.inp2.mcin}:\\\\
+This is the main output file of this step. This file is required for the next step.
+It contains the informations about the unit cell and atomic positions same as {\tt seedname.inp1.mcin} file.
+In addition, it contains the blocks for the exchange parameters and other terms of the Hamiltonian that
+should be completed in the next setp. 
+If uncomment other quantities in this file, the relevant keywords will be written in {\tt seedname.mcin} file for
+Monte-Carlo simulation step.
+{\scriptsize    
+\begin{verbatim}
+  Begin Unit_Cell_Cart
+      5.29177211   0.00000000   0.00000000
+      0.00000000   5.29177211   0.00000000
+      0.00000000   0.00000000   5.29177211
+  End Unit_Cell_Cart
+  
+  Begin Atoms_Frac
+   Mn       0.0000000   0.0000000   0.0000000    1.00
+  End Atoms_Frac
+  
+  Parameter_unit  = Ryd
+  !! Order_parameter  = .True.
+  !! Sfactor          = .True.
+  !! Staggered_m      = .True.
+  !! Binning_error    = .True.
+  !! Spin_correlation = .True.
+  !! Energy_write     = .True.
+
+  ## Hamiltonian
+  !! Boundary         =  Open
+  !! Ham_Singleion    = .True.
+  !! Ham_field        = .True.
+  !! Spin_glass       = .True.  !Add the sigma parameters as sig=.. in Parameters_Jij Block
+
+  Begin Parameters_Jij
+   Ryd
+   t1=  1:t2=  1:sh= 1:Jij= ??????!:sig=?????!:d= 5.29177211
+  End Parameters_Jij
+\end{verbatim}
+}
+\item {\tt seedname.neigh}:\\\\
+It contains informations about the neighbors of the atoms in the unit cell.
+\item {\tt seedname.xsf}:\\\\
+This is a xsf file for visulatizaton of the unit cell which can be read by the {\tt Xcrysden} or {\tt Vesta} program.
+The run command for {\tt XCrySDen} is:\\
+{\tt xcrysden --xsf seedname.xsf} \\
+The run command for {\tt Vesta} is:\\
+{\tt VESTA seedname.xsf}
+
+\end{itemize}
+%----------------------------------------------------------------------------------------
+%	Second step 
+%----------------------------------------------------------------------------------------
+\section{Second initialization step: {\tt inp2} step}
+\begin{center}
+\begin{tabular}{|c|p{10cm}|}
+\toprule
+\hline
+input file   & {\tt seedname.inp2.mcin}\\
+\hline
+Output files & {\tt seedname.mcin, seedname.neigh, seedname.mcout, seedname.xsf}\\
+\hline
+run command  & {\tt mc.x -inp2 seedname}\\
+\hline
+\bottomrule
+\end{tabular}
+\end{center}
+\subsection{Keywords of {\tt seedname.inp2.mcin} step}
+In this step, 
+the previous output file, {\tt seedname.inp2.mcin}, should be modified as the input file.
+The parmeters of Hamiltonian should be added to {\tt seedname.inp2.mcin} file.
+For writting the keywords related to the calculation of the quantities in the main MC simulation,
+the quantities could be uncommented.
+\begin{itemize}
+\item {\tt unit\_cell\_cart: }               \\
+Same as described in keywords of seedname.inp1.mcin file.
+\item {\tt atoms\_frac: }                      \\
+Same as described in keywords of seedname.inp1.mcin file.
+\item {\tt atoms\_cart: }                      \\
+Same as described in keywords of seedname.inp1.mcin file.
+\item {\tt order\_parameter: [logical]}  \\
+If set to {\tt .true.}, then the keywords to calculate the order parameter
+ are written in {\tt seedname.mcin} file.
+\item {\tt sfactor : [logical]}\\
+If set to {\tt .true.}, then the keywords to calculate the neutron structure factor        
+ are written in {\tt seedname.mcin} file.
+\item {\tt staggered\_m : [logical]}\\
+If set to {\tt .true.}, then the keywords to calculate the staggered magnetization
+ are written in {\tt seedname.mcin} file.
+\item {\tt binning\_error : [logical]}\\
+If set to {\tt .true.}, then the keywords to calculate the binning error
+ are written in {\tt seedname.mcin} file.
+\item {\tt spin\_correlation : [logical]}\\
+If set to {\tt .true.}, then the keyword to calculate the spin correlation average
+ is written in {\tt seedname.mcin} file.
+\item {\tt energy\_write : [logical]}\\
+If set to {\tt .true.}, then the keyword to write energies of each step of Monte-Carlo simulation
+ is written in {\tt seedname.mcin} file.
+\item {\tt ham\_bij: [logical]}                      \\
+Same as described in keywords of {\tt seedname.inp1.mcin} file.
+\item {\tt ham\_dij: [logical]}                      \\
+Same as described in keywords of {\tt seedname.inp1.mcin} file.
+\item {\tt ham\_Singleion : [logical]}\\
+If set to {\tt .true.}, then the keywords to include the single ion term in Hamiltonian
+ are written in {\tt seedname.mcin} file.
+\item {\tt ham\_field  : [logical]}\\
+If set to {\tt .true.}, then the keywords to include the magnetic field term in Hamiltonian  
+ are written in {\tt seedname.mcin} file.
+\item {\tt spin\_glass  : [logical]}\\
+If set to {\tt .true.}, then the keywords to include spin glass in exchange parameters of Hamiltonian 
+ are written in {\tt seedname.mcin} file.
+\item {\tt neighbors\_tol: [real]}                 \\
+Same as described in keywords of {\tt seedname.inp1.mcin} file.
+\item {\tt parameters\_jij: }                  \\
+This block specify the exchange parameters of Hamiltonian.\\\\
+{\tt begin Parameters\_jij} \\
+     \hspace*{0.5cm}$[${\tt units}$]$\\
+\hspace*{0.5cm}{\tt    type1:type2:shell:Jij\_param!:sigma!:distance}\\
+{\tt end Parameters\_jij}\\\\
+\begin{itemize} [label=$\diamond$]
+\item {{\tt units}}\\ 
+Optinal: The first line determines the units of exchange parameter and length. This line is optional.\\
+Available options for {\tt [units]} are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt ev,ang} (default)
+\item {\tt ev,bohr}
+\item {\tt ryd,ang}
+\item {\tt ryd,bohr}
+\end{itemize}
+The order of length and parameter units is not important.
+If {\tt units} not present, the default value is taken.
+If one of the units is not specified, the default value is set to that,
+ e.g. if units set to {\tt Bohr}, in this case the unit of length and 
+parameters are Bohr and eV, respectively.\\\\
+\item{{\tt type1:type2}}\\
+In second line {\tt type1} is the type of first atom and {\tt type2} is the type of neighbors of first atom.\\
+Example: {\tt t1=  1;t2=  1}\\\\
+\item{{\tt shell}} \\
+It is the shell number between {\tt type1} and {\tt type2} atoms.\\ 
+Example: {\tt sh=  1}\\\\
+\item {{\tt Jij\_param}} \\
+It is the value of the exchange parameter for these two atoms.\\
+Example: {\tt Jij=  0.00022047}\\\\
+\item {{\tt sigma}}\\
+Optional: If {\tt spin\_glass = True}, the {\tt sigma} should be specified, if don't specify the
+zero value is written for {\tt sigma} in {\tt seedname.mcin} file.\\
+Example: {\tt sig=  0.00002}\\\\
+\item{{\tt distance}}\\ 
+ It specifies th distance between {\tt type1} and {\tt type2} atoms. 
+It is just for helping and it will not be read. \\
+Example: {\tt d=  5.29177211}\\\\
+\end{itemize}
+Full example: {\tt t1=  1:t2=  1:sh= 1:Jij= 0.00022047!:sig=?????!:d= 5.29177211} \\
+Which means type 1  atoms are first neighbors and have exchange interaction equal to $0.00022047$ 
+in units specified by the units in the first line. 
+Becuase of {\tt !} sign, the two other paramters ({\it i.e.} {\tt sig} and {\tt d}) have not been read by the program.
+\item {\tt parameters\_bij: }                  \\
+Same as the {\tt parameters\_jij} block. 
+In this block {\tt bij} is the biquadratic constant of Hamiltonian.
+The only difference is that keyword {\tt sig} does not present here.\\
+{\tt begin Parameters\_bij} \\
+     \hspace*{0.5cm}$[${\tt units}$]$\\
+\hspace*{0.5cm}{\tt    type1:type2:shell:Bij\_param!:distance}\\
+{\tt end Parameters\_bij}\\  
+Example: {\tt t1=  1:t2=  1:sh= 2:Bij=-0.00004400!:d= 5.57609693} \\ 
+\item {\tt parameters\_dij: }                  \\
+Same as the {\tt parameters\_bij} block. In this block {\tt dij} is the
+Dzyaloshinskii-Moriya interaction.\\
+{\tt begin Parameters\_dij} \\
+     \hspace*{0.5cm}$[${\tt units}$]$\\
+\hspace*{0.5cm}{\tt    type1:type2:shell:Dij\_param!:distance}\\
+{\tt end Parameters\_bij}\\  
+Example: {\tt t1=  1:t2=  1:sh= 1:Dij=-0.00003000!:d= 5.57609693} \\ 
+\end{itemize}
+
+\subsection{Output files of {\tt inp2} step:}
+\begin{itemize}
+\item {\tt seedname.mcin}\\\\
+The input file for Monte-Carlo step. It contains informations about
+unit cell, position of atoms, 
+blocks which are specified the Hamiltonian and 
+relative keywords of Monte-Carlo simulations which can be modified.
+{\scriptsize    
+\begin{verbatim}
+ Begin Unit_Cell_Cart
+     5.29177211   0.00000000   0.00000000
+     0.00000000   5.29177211   0.00000000
+     0.00000000   0.00000000   5.29177211
+ End Unit_Cell_Cart
+
+ Begin Atoms_Frac
+  Mn       0.0000000   0.0000000   0.0000000    1.00
+ End Atoms_Frac
+
+ tem_start          =   5
+ tem_end            =   5
+ tems_num           =   1
+ !! tems_mode          = man
+ !! tems               = 5.00 10.00 15.00 20.00
+
+ !! Pt                 = .True.
+ !! Pt_steps_swap      = 10
+
+ steps_warmup      =       100000
+ steps_mc          =       200000
+ steps_measure     =            2
+
+ initial_sconfig   =        ferro
+ mcarlo_mode       =       random
+
+ supercell_size    =      4     4     4
+
+ Parameter_unit    = Ryd
+
+  ## Hamiltonian
+ Begin Jij_parameters
+  Ryd
+  f1=    0.000000,    0.000000,    0.000000:f2=    1.000000,    0.000000,    0.000000:jij=  0.00022047!:sh=  1!:t1=  1:t2=  1
+  f1=    0.000000,    0.000000,    0.000000:f2=    0.000000,    1.000000,    0.000000:jij=  0.00022047!:sh=  1!:t1=  1:t2=  1
+  f1=    0.000000,    0.000000,    0.000000:f2=    0.000000,    0.000000,    1.000000:jij=  0.00022047!:sh=  1!:t1=  1:t2=  1
+  f1=    0.000000,    0.000000,    0.000000:f2=    0.000000,    0.000000,   -1.000000:jij=  0.00022047!:sh=  1!:t1=  1:t2=  1
+  f1=    0.000000,    0.000000,    0.000000:f2=    0.000000,   -1.000000,    0.000000:jij=  0.00022047!:sh=  1!:t1=  1:t2=  1
+  f1=    0.000000,    0.000000,    0.000000:f2=   -1.000000,    0.000000,    0.000000:jij=  0.00022047!:sh=  1!:t1=  1:t2=  1
+ End Jij_parameters
+\end{verbatim}
+}
+\item {\tt seedname.neigh}\\\\
+same as described above.
+\item {\tt seedname.xsf}\\\\
+same as described above.
+\end{itemize}
+%----------------------------------------------------------------------------------------
+%	Thirs step  
+%----------------------------------------------------------------------------------------
+\chapter{Monte-Carlo simulation: {\tt mc.x} step}
+\begin{center}
+\begin{tabular}{|c|p{10cm}|}
+\toprule
+\hline
+input file   & {\tt seedname.mcin}\\
+\hline
+Output files & {\tt seedname.mcout, seedname\_mc.dat, seedname\_sconfig.dat, seedname\_pm.dat,
+ seedname\_spincorr.dat, seedname\_op.dat, seedname\_staggered.dat }\\
+\hline
+\multirow{2}{5cm}{run command}  & Serial: {\tt mc.x seedname}\\
+&Parallel: {\tt mpirun -np num\_proc seedname}\\
+\hline
+\bottomrule
+\end{tabular}
+\end{center}
+\subsection{Keywords of {\tt seedname.mcin} file}
+A file with {\tt .mcin} extension is the inputfile of Monte-Carlo step, which has been generated by previous step.
+In addition to information about the unit cell and atoms, keywords of Monte-Carlo simulation like temperature
+are listed in this file, that needs to be modified.
+\begin{itemize}
+\item {\tt unit\_cell\_cart: }                \\
+Same as described above.
+\item {\tt atoms\_frac: }                       \\
+Same as described above.
+\item {\tt atoms\_cart: }                       \\
+Same as described above.
+\item {\tt length\_unit: [character]}                       \\
+Same as described above.
+\item {\tt parameter\_unit: [character]}                       \\
+Same as described above.
+\item {\tt coordinate: [character]}                       \\
+Same as described above.
+\item {\tt tems\_num: [integer]}  \\
+Number of temperatures for calculation of thermodynamic properties.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default value is {\tt 1}.
+\end{itemize}
+\item {\tt tems\_mode: [character]}  \\
+Determining how the temperatures are set. \\
+Available options are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt lin or linear} (default):
+ The range between {\tt tem\_start} and {\tt tem\_end}
+ is uniformly divided by the number of temperatures {\it i.e.} {\tt tems\_num} keyword ($T_i=T_s+(T_e-T_s)\times(i-1)/(N_T-1)$).
+\item {\tt inv  or inverse}:  
+ The range between inverse {\tt tem\_start} and inverse {\tt tem\_end}
+ is uniformly divided by the number of temperatures ($1/T_i=1/T_s+(1/T_e-1/T_s)\times(i-1)/(N_T-1)$).
+\item {\tt log  or logarithmic}:  
+ The range between {\tt tem\_start} and {\tt tem\_end}
+ is  logarithmically divided by the number of temperatures ($T_i = T_s\times exp(\frac{ln(T_e/T_s)(i-1)}{(N_T-1)}$)
+\item {\tt man  or manual }: Temperatures are determined manually via {\tt tems} keyword.
+\end{itemize}
+\item {\tt tem\_start: [real]}    \\
+Starting temperature in Kelvin unit.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default value is {\tt 5.0}K.
+\end{itemize}
+\item {\tt tem\_end: [real]}      \\
+Ending temperature in Kelvin unit.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default value is {\tt 5.0}K.
+\end{itemize}
+\item {\tt tems(tems\_num): [real]}             \\
+If {\tt tems\_mode = man}, then the temperatures read from {\tt tems} keyword.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  No default.
+\end{itemize}
+\item {\tt steps\_warmup: [integer]}                  \\
+Number of steps for initial warm-up of the system.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default value is {\tt 100000}.
+\end{itemize}
+\item {\tt steps\_mc: [integer]}                      \\
+Number of steps for sampling from system.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default value is {\tt 200000}.
+\end{itemize}
+\item {\tt steps\_measure: [integer]}                 \\
+Number of steps between successive samplings
+\footnote{The total number of MC steps is {\tt steps\_mc} $\times$ {\tt steps\_measure}.}
+.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default value is {\tt 2}.     
+\end{itemize}
+\item {\tt supercell\_size(3): [integer]}                \\
+Dimensions of the simulation supercell.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt\hspace{0.5cm} 4\hspace{1cm}4\hspace{1cm}4}.
+\end{itemize}
+\item {\tt initial\_sconfig: [character]}             \\
+Initial spin configuration of system.\\
+Available options are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  {\tt ferro} or {\tt ferromagnetism} (default).
+\item  {\tt rand} or {\tt random}.
+\item  {\tt file}: Spin configuration reads from {\tt seedname\_sconfig.dat} file.
+\end{itemize}
+\item {\tt mcarlo\_mode: [character]}                 \\
+Determineng how the new direction of spin is chosen during each Monte-Carlo step.\\
+Available options are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  {\tt rand} or {\tt random} (default): Completely at random
+\item  {\tt const} or {\tt constraint}: 
+The new direction of spin is chosen randomly inside 
+ a cone.   The cone axis is the previous direction of the spin and the cone angle ($\Delta\Theta$) can be specified by {\tt tilt\_angles\_max } 
+\end{itemize}
+\item {\tt tilt\_angles\_max: [real]}               \\
+ If {\tt mcarlo\_mode = const}, $\Delta\Theta = ${\tt tilt\_angles\_max*$\pi$} determines the cone angle which is explained above.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item If {\tt mcarlo\_mode = const}, the default is {\tt 0.125}.
+\end{itemize}
+\item {\tt seeds(number of nodes): [integer]}              \\
+A list of seeds for generation of the random numbers.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item If not specify, seeds getting from  reading of the computer's clock.\\
+ For example, to enter seeds of 1, 19, 5, 6, 7, 8, 10, 12:\\
+{\tt seeds = 1,19,5-8,10,12}
+\end{itemize}
+\item {\tt pt: [logical]}            \\
+If {\tt pt = .true.}, the parallel tempering algorithm is done.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt .false.}.
+\end{itemize}
+\item {\tt pt\_steps\_swap: [integer]}                 \\
+If {\tt pt = .true.}, after {\tt pt\_steps\_swap} Monte-Carlo steps, configrations swap is done.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt 1}.
+\end{itemize}
+\item {\tt pt\_print\_swap: [integer]}                 \\
+If {\tt pt = .true.}, after {\tt pt\_print\_swap} Monte-Carlo steps, ordering of configurations is printed.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt 10000}.
+\end{itemize}
+\item {\tt staggered\_m: [logical]}                      \\
+If set to {\tt .true.}, the staggered magnetization will be calculated and 
+printed to a file {\tt seedname\_staggered.dat}. The staggered magnetization is the summation of magnetic moments 
+with $\pm 1$ coefficients inside the unit cell {\it i.e.} $\frac{\sum_{I=1}^{N_{atom}} c_I {\textbf m}_I}{N_{atom}}$ where $c_I$ 
+is either $+1$ or $-1$ and can be specified by {\tt staggered\_m\_coeff}.  
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt staggered\_m\_coeff(number of atoms): [integer]}             \\
+The coefficients for calculating staggered magnetization.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt 1} for all atoms.
+\end{itemize}
+\item {\tt order\_parameter: [logical]}                  \\
+If {\tt order\_parameter= .true.}, user defined order parameter, its suseptibility and
+its fourth-order cumulant are calculated.
+The quntities will be written to a file {\tt seedname\_op.dat}. 
+ The order parameter is defined by $\frac{\sum_{I=1}^{N_{atom}}{\textbf m}_I.\textbf{d}_I}{N_{atom}}$ 
+where $\textbf{d}_I$ vectors are specified inside {\tt order\_parameter\_axes} block.
+\item {\tt order\_parameter\_axes: }  \\
+If {\tt order\_parameter = .true.}, the $\textbf{d}_I$ vectors should be specify for each atom.
+They can be introduced in two coordinates like atomic postions:
+\begin{center}
+    \begin{tabular}{p{0.4\linewidth}p{0.4\linewidth}}
+        \toprule
+        \multicolumn{1}{l}{\la 1) Fractinal coordinates} & \multicolumn{1}{l}{\la 2) Cartesian coordinates} \\ \midrule
+        {\tt begin order\_parameter\_axes\_frac}  & {\tt begin order\_parameter\_axes\_cart} \\
+        \multirow{2}{*}{{\tt \hspace{0.2cm} $I_{sym}$\hspace{0.3cm}  $ f_x \hspace{0.2cm} f_y \hspace{0.2cm} f_z $}}
+                            & {\tt [units]}                   \\
+                            &
+        {\tt \hspace{0.2cm} $I_{sym}$\hspace{0.3cm}  $ d_{ix} \hspace{0.2cm} d_{iy} \hspace{0.2cm} d_{iz} $}  \\
+        {\tt end order\_parameter\_axes\_frac}    & {\tt end order\_parameter\_axes\_cart} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+It’s not necessary for the vectors to be normal (the program will normalize them).
+\item {\tt binning\_error: [logical]}                    \\
+If {\tt binning\_error = .true.}, error of the energy, magnetization and order parameter,
+ (if {\tt order\_parameter = .true.}) will be computed via binning analysis method
+($\Delta_A^{(l)}\approx\sqrt{\frac{1}{M_l(M_l-1)}\sum_{i=1}^{M_l}(A_i^{(l)}-\bar{A}^{(l)})}$),
+ where $M_l=\frac{M}{2^l}$ and $M$ is number of Monte-Carlo steps.
+The values of binning error will be written to a file {\tt seedname\_binerror.dat}.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt binning\_level(:): [integer]}                    \\
+Determines a list of the $l$ values for binning analysis method. 
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt 1-5}.\\
+ For example, to compute the binning 
+error for binning levels of 3, 4, 5, 8 and 10:\\
+{\tt binning\_level = 3-5, 8, 10}
+\end{itemize}
+\item {\tt spin\_correlation: [logical]}                 \\
+If {\tt spin\_correlation = .true.}, spin correlation will be calculated and
+ written to a file {\tt seedname\_spincorr.dat}.
+\item {\tt energy\_write: [logical]}                     \\
+If {\tt energy\_write = .true.}, energy of each Monte-Carlo step
+will be written to a file {\tt seedname\_energy-T\#.dat}.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt energy\_num\_print: [integer]}              \\
+After {\tt energy\_num\_print} Monte-Carlo steps, the energies of these steps will be printed. 
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt 1000}.
+\end{itemize}
+\item {\tt sfactor: [logical]}                             \\
+If {\tt sfactor = .true.}, neutron structure factor will be calculated at a plane.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt sfactor\_polar(3): [real]}                    \\
+The polarization vector in reduced coordinates.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item No default.
+\end{itemize}
+\item {\tt sfactor\_corner(3): [real]}                   \\
+Corner of the plane in the reduced coordinates of q-space.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt\hspace{0.5cm} 0.0\hspace{1cm}0.0\hspace{1cm}0.0}.
+\end{itemize}
+\item {\tt sfactor\_q1(3): [real]}                       \\
+The first vector defining the plane in the reduced coordinates of q-space.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt\hspace{0.5cm} 1.0\hspace{1cm}0.0\hspace{1cm}0.0}.
+\end{itemize}
+\item {\tt sfactor\_q2(3): [real]}                       \\
+The second vector defining the plane in the reduced coordinates of q-space.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt\hspace{0.5cm} 0.0\hspace{1cm}0.0\hspace{1cm}1.0}.
+\end{itemize}
+\item {\tt sfactor\_2dqmesh(2): [integer]}                  \\
+Dimensions of the q-point grid covering the plane.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item  The default is {\tt \hspace{0.5cm}50\hspace{1cm}50}.
+\end{itemize}
+\item {\tt sfactor\_steps\_measure: [real]}         \\
+After {\tt sfactor\_steps\_measure} Monte-Carlo steps, the neutron structure factor is computed.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt 100}.
+\end{itemize}
+\item {\tt spin\_glass: [logical]}                       \\
+If {\tt spin\_glass = .true.}, the exchange parameters of Hamiltonian are chosen via gaussian random numbers.
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt spin\_glass\_seed: [integer]}               \\
+Seed for the gaussian random numbers generator, if {\tt spin\_glass = .true.}. 
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item If not specify, seed gets from the computer's clock.
+\end{itemize}
+\item {\tt boundary: [character]}\\
+Determines the ineteraction of spins on the boarders of supercell.
+Available options are:
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt peri} or {\tt periodic} (default)
+\item {\tt open}
+\end{itemize}
+\item {\tt jij\_parameters: }\\
+This block specifies the position of atoms, their neighbors and exchange interaction between them.    \\
+\begin{verbatim}
+ Begin Jij_parameters
+  [units]
+  site1:site2:jij_param:[shell]:[sigma]
+ End Jij_parameters
+\end{verbatim}
+\begin{itemize} [label=$\diamond$]
+\item {\tt units}\\
+Optional: The units of exchange parameters and sites specify in first line. 
+{\tt eV} and {\tt Ryd} are options for 
+exchange parmeters and {\tt Ang} and {\tt Bohr} for atomic sites if given
+in Cartesian coordinates. The default value is {\tt ang, ev}.
+\item {\tt site1:site2:jij\_param} \\
+%The position of atom and its neighbors may be specify in the Cartesian or fractional coordinates.\\
+Atom at the {\tt site1} position and its neighbor at the {\tt site2} position are
+ specified in the Cartesian or fractional coordinates, have {\tt jij\_param} exchange interaction.\\
+Example: {\tt c1=0.0,0.0,0.0:c2=2.5,2.5,2.5:jij=0.002} \\
+Which means two atoms 
+are located in (0.0,0.0,0.0) and (2.5,2.5,2.5) respectively  
+in Cartesian coordinates and
+have exchange interaction equal to $0.002$
+in energy unit specified by the {\tt units} in the first line. \\
+Example: {\tt f1=0.0,0.0,0.0:f2=0.5,0.5,0.5:jij=0.004}\\
+Which means two atoms 
+ are located in (0.0,0.0,0.0) and (0.5,0.5,0.5) respectively  
+in fractional coordinates
+have exchange interaction equal to $0.004$
+in energy unit specified by the {\tt units} in the first line. 
+\item {\tt shell} \\
+Optional: If {\tt spin\_correlation = true}, the shell number 
+should specify as "{\tt sh=?}" in {\tt jij\_parameters} block.\\
+Example: {\tt sh = 1}\\
+Which means the atoms at the {\tt site1} and {\tt site2} positions are the first neighbors of each other. 
+\item {\tt sigma} \\
+Optional: If {\tt spin\_glass = true}, the value of 
+broadening of gaussian function for random number generator 
+determine as {\tt sig=} in units specified by the optional
+string units in the first line\\
+Example: {\tt sig = 0.2}\\ 
+Which sets the sigma parameter to $0.2$ in the units specified by the string units.\\
+\end{itemize}
+\item {\tt ham\_bij: [logical]}                          \\
+Determining whether the Hamiltonian includes the biquadratic term.
+\item {\tt bij\_parameters: }                   \\
+This block specifies the position of atoms, their neighbors and biquadratic interaction between them.   
+\begin{verbatim}
+ Begin Bij_parameters
+  [units]
+  site1:site2:bij_param
+ End Bij_parameters
+\end{verbatim}
+{\tt units}\\
+Same as described above for {\tt jij\_parameters}.\\
+{\tt site1:site2:bij\_param}\\
+Same as described above for {\tt jij\_parameters}.\\
+Example:
+{\tt c1=0.0,0.0,0.0:c2=2.5,2.5,2.5:bij=0.0002}
+\item {\tt ham\_dij: [logical]}                          \\
+Determining whether the Hamiltonian includes the Dzyaloshinskii-Moriya term.
+\item {\tt dij\_parameters: }                   \\
+This block specifies the position of atoms, their neighbors and Dzyaloshinskii-Moriya interaction between them.    
+\begin{verbatim}
+ Begin Dij_parameters
+  [units]
+  site1:site2:dij_param
+ End Dij_parameters
+\end{verbatim}
+{\tt units}\\
+Same as described above for {\tt jij\_parameters}.\\
+{\tt site1:site2:dij\_param}\\
+Same as described above for {\tt jij\_parameters}.\\
+Example:
+{\tt c1=0.0,0.0,0.0:c2=2.5,2.5,2.5:dij=0.0002}
+\item {\tt dij\_vectors: }                   \\
+Direction of dij vectors specifies by this block. Ordering of vectors should be same as {\tt dij\_parameters} block.
+Vectors can be defined in two coordinates:
+\begin{center}
+    \begin{tabular}{p{0.4\linewidth}p{0.4\linewidth}}
+        \toprule
+        \multicolumn{1}{l}{\la 1) Fractinal coordinates} & \multicolumn{1}{l}{\la 2) Cartesian coordinates} \\ \midrule
+        {\tt begin dij\_vectors\_frac}  & {\tt begin dij\_vectors\_cart} \\
+        \multirow{2}{*}{\tt \hspace{0.2cm} $ f_x \hspace{0.2cm} f_y \hspace{0.2cm} f_z$} &
+                        {\tt [units]}                 \\
+                            &
+        {\tt \hspace{0.2cm} $ d_{x} \hspace{0.2cm} d_{y} \hspace{0.2cm} d_{z}$}  \\
+        {\tt end dij\_vectors\_frac}    & {\tt end dij\_vectors\_cart} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+Options are {\tt Ang} and {\tt bohr} for {\tt units}. Since only the direction is important and 
+the program will normalize the vectors, being of units does not matter. 
+\item {\tt ham\_singleion: [logical]}                          \\
+If set to {\tt .true.}, Hamiltonian has the single-ion term ($\mathcal{H}=\sum_{I=1}^{N_{atom}}\Delta_I\,\hat{\mathcal{Z}_I}\cdot\textbf{S}_I$).
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt singleion\_axes(:,:): }                   \\
+This block specifies the direction of anisotrpy and anisotropy parameter. The axes can be defined in two coordinates:
+\begin{center}
+    \begin{tabular}{p{0.4\linewidth}p{0.4\linewidth}}
+        \toprule
+        \multicolumn{1}{l}{\la 1) Fractinal coordinates} & \multicolumn{1}{l}{\la 2) Cartesian coordinates} \\ \midrule
+        {\tt begin singleion\_axes\_frac}  & {\tt begin singleion\_axes\_cart} \\
+        {\tt [units]}                    & {\tt [units]}                   \\
+        {\tt \hspace{0.2cm} I$_{sym}\hspace{0.3cm}   f_x \hspace{0.2cm} f_y \hspace{0.2cm} f_z \hspace{0.2cm}\Delta_I $}
+                            &
+        {\tt \hspace{0.2cm} I$_{sym}\hspace{0.3cm}   \mathcal{Z}_{Ix} \hspace{0.2cm}\mathcal{Z}_{Iy} \hspace{0.2cm} \mathcal{Z}_{Iz} \hspace{0.2cm}\Delta_I$}  \\
+        {\tt end singleion\_axes\_frac}    & {\tt end singleion\_axes\_cart} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+Program will normalize the direction of vectors.\\
+Available options for {\tt units} for {\tt singleion\_axes\_frac} block are: 
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt ev} (default)
+\item {\tt ryd}
+\end{itemize}
+Available options for {\tt units} for {\tt singleion\_axes\_cart} block are: 
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item {\tt ev,ang} (default)
+\item {\tt ev,bohr}
+\item {\tt ryd,ang} 
+\item {\tt ryd,bohr}
+\end{itemize}
+The order of length and parameter units is not important.
+If {\tt units} not present, the default value is taken.
+If one of the units is not specified, the default value is set to that.
+\item {\tt ham\_field: [logical]}                          \\
+If set to {\tt .true.}, the magnetic field term add to Hamiltonian
+($\mathcal{H}=\sum_{I=1}^{N_{atom}}B_I\hat{\mathcal{Z}_{I}}\cdot\textbf{S}_I$).
+\begin{itemize} [label=\adfhalfrightarrowhead]
+\item The default is {\tt .false.}.
+\end{itemize}
+\item {\tt field\_axes(:,:):}                   \\
+This block specifies the direction of applied magnetic field and its value . The axes can be defined in two coordinates:
+\begin{center}
+    \begin{tabular}{p{0.4\linewidth}p{0.4\linewidth}}
+        \toprule
+        \multicolumn{1}{l}{\la 1) Fractinal coordinates} & \multicolumn{1}{l}{\la 2) Cartesian coordinates} \\ \midrule
+        {\tt begin field\_axes\_frac}  & {\tt begin field\_axes\_cart} \\
+        \multirow{2}{*}{{\tt \hspace{0.2cm} I$_{sym}\hspace{0.3cm}   f_x \hspace{0.2cm} f_y \hspace{0.2cm} f_z \hspace{0.2cm}B_I $}}
+                  & {\tt [units]}                   \\
+                            &
+        {\tt \hspace{0.2cm} I$_{sym}\hspace{0.3cm}   \mathcal{Z}_{Ix} \hspace{0.2cm}\mathcal{Z}_{Iy} \hspace{0.2cm} \mathcal{Z}_{Iz} \hspace{0.2cm}B_I$}  \\
+        {\tt end field\_axes\_frac}    & {\tt end field\_axes\_cart} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+Program will normalize the direction vector.\\
+The unit of B is Tesla.
+\end{itemize}
+
+\subsection{Output files of {\tt mc.x} step:}
+\begin{itemize}
+\item {\tt seedname.mcout}\\\\
+The information about the inputfile keywords, number of  
+rejected and accepted steps are written in this file.
+\item {\tt seedname\_mc.dat}\\\\
+This file contains the quantities such as the magnetization, average energy,
+ magnetic specific heat($C_M=\frac{\braket{E^2}-\braket{E}^2}{NKT^2}$),
+ suseptibility($\chi=\frac{\braket{M^2}-\braket{M}^2}{NKT}$), 
+fourth-order cumulant of energy ($U_E=1-\frac{1}{3}\frac{\braket{E^4}}{\braket{E^2}^2}$) 
+and fourth-order cumulant of magnetization($U_M=1-\frac{1}{3}\frac{\braket{M^4}}{\braket{M^2}^2}$) for each temperature.
+
+Example of {\tt seedname\_mc.dat} file:
+{\scriptsize    
+\begin{verbatim}
+ #written on 25Jul2019 at 17:15:19 
+ #------------------------------------------------- MONTECARLO -------------------------------------------------#
+ # Temp      Magnetization     Energy_ave          C_M              Sus              U_E              U_M       #
+ #--------------------------------------------------------------------------------------------------------------#
+   4.0000   0.97301411E+00  -0.10039260E+03   0.10223041E+01   0.40787762E-03   0.66666450E+00   0.66666437E+00
+   5.5238   0.96244063E+00  -0.98832823E+02   0.10273965E+01   0.56983079E-03   0.66666239E+00   0.66666214E+00
+   7.0476   0.95169101E+00  -0.97259004E+02   0.10410840E+01   0.74522096E-03   0.66665938E+00   0.66665894E+00
+   8.5714   0.94074662E+00  -0.95672098E+02   0.10474720E+01   0.92460633E-03   0.66665546E+00   0.66665474E+00
+  10.0952   0.92959523E+00  -0.94069462E+02   0.10571282E+01   0.11155972E-02   0.66665044E+00   0.66664931E+00
+  11.6190   0.91824981E+00  -0.92451287E+02   0.10697373E+01   0.13109812E-02   0.66664414E+00   0.66664260E+00
+\end{verbatim}
+}
+\item {\tt seedname\_sconfig.dat}\\\\
+The first line gives the date and time  that the file was created.
+The second line states the number of total atoms ({\tt num\_atom*supercell\_size(1)*supercell\_size(2)*supercell\_size(3)}) 
+and number of temperatures ({\tt num\_tems}). Then there are {\tt num\_tems} blocks of data, each starts
+by a line states the temeprature followed by (number of total atoms) lines containing the spin direction for each site of atom.
+The spin of atoms are written in {\tt x, y,} and {\tt z} order.
+This file will be read, if {\tt initial\_sconfig = file}. In this case, temperatures and number of total atoms 
+must be the same as {\tt seedname.mcin} input file.\\
+
+Example of {\tt seedname\_sconfig.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ Created on 26Jul2019 at 14:57:10 
+  3456    64
+    4.000000
+    0.021731    0.170958    0.985039
+   -0.111871    0.155007    0.981559
+   -0.163746    0.029309    0.986067
+   -0.232591   -0.086163    0.968750
+    0.427986    0.014272    0.903673
+   -0.257394    0.058855    0.964512
+    .
+    .
+    .
+    5.206349
+    0.167293   -0.149844   -0.974454
+    0.278237    0.188479   -0.941839
+   -0.186044    0.137737   -0.972839
+    0.066792   -0.105264   -0.992199
+    0.324208   -0.060875   -0.944025
+    0.006523   -0.219877   -0.975506
+    .
+    .
+    .
+\end{verbatim}
+}
+\item {\tt seedname\_pm.dat}\\\\
+Probability distribution function of the magnetization, 
+order parameter(if {\tt order\_parameter = .True.}), and staggerd magnetization (if {\tt staggered\_m = .True.}) 
+per unit cell, are written in this file.\\
+
+ Example of {\tt seedname\_pm.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ #written on 27Jul2019 at 14:26:46
+ #-------------------------- MONTECARLO -------------------------------#
+ #       M or OP                 P(M)                     P(OP)        #
+ #---------------------------------------------------------------------#
+ #T=    45.0000
+  -0.40000000E+01           0.00000000E+00           0.00000000E+00
+  -0.39900000E+01           0.00000000E+00           0.21000000E-05
+  -0.39800000E+01           0.00000000E+00           0.10700000E-04
+  -0.39700000E+01           0.00000000E+00           0.38000000E-04
+  -0.39600000E+01           0.00000000E+00           0.74200000E-04
+  -0.39500000E+01           0.00000000E+00           0.12770000E-03
+  -0.39400000E+01           0.00000000E+00           0.21910000E-03
+  -0.39300000E+01           0.00000000E+00           0.30930000E-03
+  -0.39200000E+01           0.00000000E+00           0.42990000E-03
+  -0.39100000E+01           0.00000000E+00           0.57120000E-03
+  -0.39000000E+01           0.00000000E+00           0.74520000E-03
+  -0.38900000E+01           0.00000000E+00           0.91300000E-03
+  -0.38800000E+01           0.00000000E+00           0.11194000E-02
+  -0.38700000E+01           0.00000000E+00           0.13601000E-02
+  -0.38600000E+01           0.00000000E+00           0.15820000E-02
+  -0.38500000E+01           0.00000000E+00           0.18151000E-02
+  -0.38400000E+01           0.00000000E+00           0.20443000E-02
+\end{verbatim}
+}
+\item {\tt seedname\_op.dat}\\\\
+It will be created if {\tt order\_parameter = .True.}. The file contains the value of order
+parameter, suseptibilty drived from order parameter and 
+fourth-order cumulant of order parameter for each temperature.\\
+
+ Example of {\tt seedname\_op.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ #written on 27Jul2019 at 14:26:46 
+ #------------------------------- MONTECARLO -----------------------------------#
+ #    Temp              OP                 Sus_OP                 U_OP          #
+ #------------------------------------------------------------------------------#
+      3.0000      0.98380800E+00       0.28590184E-03        0.66666637E+00
+      3.6667      0.98008392E+00       0.36023649E-03        0.66666621E+00
+      4.3333      0.97634897E+00       0.42725623E-03        0.66666602E+00
+      5.0000      0.97250993E+00       0.51417504E-03        0.66666576E+00
+      5.6667      0.96863205E+00       0.57603718E-03        0.66666551E+00
+      6.3333      0.96471222E+00       0.63757355E-03        0.66666522E+00
+      7.0000      0.96071416E+00       0.73423020E-03        0.66666481E+00
+\end{verbatim}
+}
+\item {\tt seedname\_spincorr.dat}\\\\
+It will be created  if {\tt spin\_correlation = .True.}. \\
+
+
+Example of {\tt seedname\_spincorr.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ #written on 25Jul2019 at 23:50:10 
+ #---------------------------- MONTECARLO --------------------------------------------------#
+ #  Temp    Shell    Atom1    Type1    Atom2    Type2        <Si.Sj>             <|Si.Sj|>  #
+ #------------------------------------------------------------------------------------------#
+   4.0000     1       Ni        1       Ni        1        -0.000217133         0.952826046
+   4.0000     2       Ni        1       Ni        1        -0.000145175         0.954045339
+   4.0000     3       Ni        1       Ni        1        -0.964845487         0.964845487
+   4.0000     4       Ni        1       Ni        1        -0.965767855         0.965767855
+   5.2063     1       Ni        1       Ni        1        -0.000281096         0.938297923
+   5.2063     2       Ni        1       Ni        1        -0.000188514         0.939879738
+   5.2063     3       Ni        1       Ni        1        -0.954059720         0.954059721
+   5.2063     4       Ni        1       Ni        1        -0.955265013         0.955265013
+\end{verbatim}
+}
+\item {\tt seedname\_staggered.dat}\\\\
+It will be created  if {\tt staggered\_m = .True.}. \\
+
+
+Example of {\tt seedname\_staggered.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ #written on 14Aug2019 at 12:42:25 
+ #------------------------------- MONTECARLO --------------------------------#
+ #    Temp         Staggered_m          Sus_Staggered_m       U_Staggered_m  #
+ #---------------------------------------------------------------------------#
+      4.0000      0.10000000E+01       0.00000000E+00        0.66666667E+00
+      5.2063      0.10000000E+01       0.00000000E+00        0.66666667E+00
+\end{verbatim}
+}
+\item {\tt seedname\_binerror.dat}\\\\
+It will be created  if {\tt binning\_error = .True.}. If {\tt staggered\_m = .True.}, binning error of
+staggered magnetization and if {\tt order\_parameter = .True.}, binning error of
+order parameter in addition to binning error of energy and magnetization are written in this file.\\
+
+
+Example of {\tt seedname\_binerror.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ #----------------------------- MONTECARLO -------------------------------#
+ #  Binning_level     Error(E)          Error(M)      Error(Staggered_m)  #
+ #------------------------------------------------------------------------#
+ #T=     4.0000
+         3         0.87918552E-03    0.11215477E-04    0.11585869E-04
+         4         0.12131111E-02    0.14096887E-04    0.14483712E-04
+         5         0.16413111E-02    0.16722497E-04    0.17084558E-04
+         8         0.32116285E-02    0.19928343E-04    0.22639476E-04
+        10         0.41449552E-02    0.15621591E-04    0.37641995E-04
+ #T=     5.2063
+         3         0.10832774E-02    0.12533707E-04    0.12822853E-04
+         4         0.14891987E-02    0.15463829E-04    0.15806900E-04
+         5         0.20082889E-02    0.17339297E-04    0.17794397E-04
+         8         0.37238151E-02    0.17278975E-04    0.16483297E-04
+        10         0.50696623E-02    0.20335130E-04    0.21200919E-04
+\end{verbatim}
+}
+\item {\tt seedname\_energy-T\#.dat}\\\\
+It will be created if {\tt energy\_write = .True.}. For each temperature, a file is created. \# 
+in the filename is representative of the temperature number. 
+The files contain the energy of each Monte-Carlo step. The first line gives the
+date and time which the file is created. The second line states the temperature.
+The third line gives the number of Monte-Carlo steps ({\tt steps\_mc}). 
+In the subsequent lines({\tt steps\_mc} lines), 
+Monte-Carlo steps are written in the left column, and the
+ corresponding energies in units of Kelvin are written in the right column.\\
+
+Example of {\tt seedname\_energy-T\#.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+ #written on 14Aug2019 at 11:51:17 
+   # T =    4.0000
+              10000
+             1     -0.10729348E+03
+             2     -0.10727368E+03
+             3     -0.10727368E+03
+             4     -0.10726382E+03
+             5     -0.10719288E+03
+             6     -0.10728927E+03
+             7     -0.10730791E+03
+             8     -0.10734059E+03
+             9     -0.10744699E+03
+            10     -0.10748358E+03
+\end{verbatim}
+}
+There is a utility program for computting the histogram of energy in utility directory.
+The {\tt mc-hist.x} will computed the histogram, for example just type:\\
+{\tt mc-hist.x seedname\_energy-T001.dat}\\
+The program will ask a value for gaussian broadening:\\
+{\tt Enter gaussian broadening = }\\
+If the Gaussian broadening {\color{blue} is} set to zero no smearing is included in the histogram, in otherwise a smearing with 
+the Methfessel function is included.
+The output file is {\tt seedname\_energy-T001.dat.hist}.
+\item {\tt seedname\_sf-T\#.dat}\\\\
+It will be created if {\tt sfactor = .True.}. This file is created for each temperature. 
+\#  in the filename is the temperature number.
+The first and second column are the grid coordinates in unit of {\tt Ang$^{-1}$}. 
+The third column gives the neutron staructure factor.\\
+
+
+Example of {\tt seedname\_sf-T\#.dat}  file:
+{\scriptsize    
+\begin{verbatim}
+    0.00000000E+00    0.00000000E+00    0.00000000E+00
+    0.00000000E+00    0.13816693E+00    0.16880325E-01
+    0.00000000E+00    0.27633385E+00    0.69726350E-01
+    0.00000000E+00    0.41450078E+00    0.22007001E+00
+    0.00000000E+00    0.55266770E+00    0.47667495E+00
+    0.00000000E+00    0.69083463E+00    0.55251300E+03
+    0.00000000E+00    0.82900155E+00    0.47667495E+00
+    0.00000000E+00    0.96716848E+00    0.22007001E+00
+    0.00000000E+00    0.11053354E+01    0.69726350E-01
+    0.00000000E+00    0.12435023E+01    0.16880325E-01
+    0.00000000E+00    0.13816693E+01    0.11538101E-01
+    0.00000000E+00    0.15198362E+01    0.16880325E-01
+    0.00000000E+00    0.16580031E+01    0.69726350E-01
+    0.00000000E+00    0.17961700E+01    0.22007001E+00
+    0.00000000E+00    0.19343370E+01    0.47667495E+00
+    0.00000000E+00    0.20725039E+01    0.55251300E+03
+    0.00000000E+00    0.22106708E+01    0.47667495E+00
+\end{verbatim}
+}
+\item {\tt seedname\_sf.py}\\\\    
+\redsout{Written} {\color{blue} It will be created} if {\tt sfactor = .True.}, 
+a python script to plot the neutron structure factor.
+\item {\tt seedname\_sf.gnu}\\\\    
+\redsout{Written} {\color{blue} It will be created}  if {\tt sfactor = .True.}, a gnuplot script to plot the neutron structure factor.
+\end{itemize}
+\chapter{Heisenberg Hamiltonian: {\tt -ham} command}
+\begin{center}
+\begin{tabular}{|c|p{10cm}|}
+\toprule
+\hline
+input file   & {\tt seedname.inp1.mcin}\\
+\hline
+Output files & {\tt seedname.ham, seedname.neigh, seedname.mcout, seedname.xsf}\\
+\hline
+run command  & {\tt mc.x -ham seedname}\\
+\hline
+\bottomrule
+\end{tabular}
+\end{center}
+One characteristic of {\tt ESpin} is its ability for calculation of the coefficients of Heisenberg Hamiltonian
+for a specific spin configuration. One procedure to finding the effective spin Hamiltonian from {\it ab initio} based methods 
+is mapping the total energies of some spin configurations to
+an appropriate spin Hamiltonian. This procedure gives the coupling constants of spin Hamiltonian for real
+material. {\tt -ham mc.x} run can help to achieve the coefficients of Heisenberg Hamiltonian for each spin configuration.
+\section{Inputfile Keywords}
+Same as the {\tt seedname.inp1.mcin} file.
+\section{Output files:}
+\begin{itemize}
+\item {\tt seedname.ham}\\\\
+The main output file of this step. The coefficeint of Heisenberg Hamiltonian are written in this file.
+\item {\tt seedname.neigh}\\\\
+Same as described in {\tt -inp1} step.
+\item {\tt seedname.xsf}\\\\
+Same as described in {\tt -inp1} step.
+\item {\tt seedname.mcout}\\\\
+Same as described in {\tt -inp1} step.
+\end{itemize}
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\bibliographystyle{apalike}
+
+\bibliography{sample}
+
+%----------------------------------------------------------------------------------------
+
+
+\end{document}

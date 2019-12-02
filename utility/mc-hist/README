@@ -1,0 +1,16 @@
+1- to compile, type:
+  
+   make
+
+2- The input file of the program:
+
+    seedname_energy-T#.dat
+
+
+3-To run the program, type:
+
+  ./mc-hist.x seedname_energy-T#.dat
+
+for example:
+
+  ./mc-hist.x snwo_energy-T001.dat 

@@ -1,0 +1,26 @@
+#/bin/bash
+
+printf "\n %-6s %s\n " "Begin" "Unit_Cell_Cart"
+printf " %s\n " "!Bohr"
+printf "%s  \n " " A_1x        A_1y       A_1z"  
+printf "%s  \n " " A_2x        A_2y       A_2z" 
+printf "%s  \n " " A_3x        A_3y       A_3z"  
+printf "%s \n" "End Unit_Cell_Cart"
+
+printf "\n %-6s %1s\n " "Begin" "Atoms_Frac"
+printf "%s  \n " " atom_symbol  atom_pos_x  atom_pos_y  atom_pos_z  magnetic_moment"
+printf "%-4s %1s\n " "End" "Atoms_Frac"
+
+printf "\n%s \n"    " Shells_jij      = 1"
+printf " %s \n"     "!! Spin_glass      = .True."
+printf " %s \n"     "!! Ham_bij         = .True."
+printf " %s \n"     "!! Shells_bij      = 1"
+printf " %s \n"     "!! Ham_dij         = .Ture."
+printf " %s \n"     "!! Shells_dij      = 1"
+                       
+printf "\n %s"      "!! Length_unit     = Bohr"
+printf "\n %10s "   "!! Parameter_unit  = Ryd"
+printf "\n %s \n "  "!! Coordinate      = Cart"
+
+
+

@@ -1,0 +1,18 @@
+# The results of this example can be compared by results in the follwoing paper: 
+#"High-accuracy Monte Carlo study of the three-dimensional classical Heisenberg ferromagnet", Phys. Rev. B 43, 6087
+
+
+1) run 
+   mc.x -inp1 cubic
+2) add Jij value in Parameters_Jij block of  cubic.inp2.mcin file
+
+  Begin Parameters_Jij
+   t1=  1:t2=  1:sh= 1:Jij= 0.00300!:sig=?????!:d= 5.29177211
+  End Parameters_Jij
+   
+3) Uncomment any other parameters that you want to be calculated in monte carlo simulations 
+4) run 
+   mc.x -inp2 cubic
+5) edit temperatures, supercell size according to what you want in cubic.mcin file
+6) run
+   mc.x cubic

@@ -1,0 +1,17 @@
+      
+      Begin unit_cell_cart
+       Bohr
+        10.000 0.000 0.000
+        0.000 10.000 0.000
+        0.000 0.000 10.000
+      End unit_cell_cart
+      
+      Begin atoms_frac   
+        Mn 0.00   0.00   0.00  1.00   
+      End atoms_frac
+      
+      Shells_jij=1
+      
+      Parameter_unit = eV
+     !! Length_unit      = bohr
+     !! Coordinate       = cart
