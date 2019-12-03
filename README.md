@@ -6,7 +6,7 @@ the Heisenberg exchange, bi-quadratic, Dzyaloshinskii-Moriya, and single-ion int
 Spin configurations can be updated through either local Metropolis updating or parallel tempering. 
 
 If you are using this software, please cite
-> Nfise Rezaei, Mojtaba Alaei, Hadi Akbarzadeh, ESpinS: A program for classical Monte-Carlo simulations of spin systems. 
+> Nfise Rezaei, Mojtaba Alaei, Hadi Akbarzadeh, ESpinS: A program for classical Monte-Carlo simulations of spin systems, arXiv:1912.00793
 
 
 ## Requirements
