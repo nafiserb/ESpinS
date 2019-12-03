@@ -28,7 +28,7 @@ For more information about installation please see user-guide.
 
 ## About
 
-Created and maintained by Nafise Rezaei (Physics department, Isfahan University of Technology, Isfahan, Iran)
+Created and maintained by Nafise Rezaei (Physics Department, Isfahan University of Technology, Isfahan, Iran)
 
 With contributions by
 * Mojtaba Alaei (Physics Department, Isfahan University of Technology, Isfahan, Iran)
