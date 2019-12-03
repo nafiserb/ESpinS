@@ -31,4 +31,4 @@ For more information about installation please see user-guid.
 Created and maintained by Nafise Rezaei (Physics department, Isfahan University of Technology, Isfahan, Iran)
 
 With contributions by
-* Mojtaba Alaei (Physics department, Isfahan University of Technology, Isfahan, Iran)
+* Mojtaba Alaei (Physics Department, Isfahan University of Technology, Isfahan, Iran)
