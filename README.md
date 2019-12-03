@@ -24,7 +24,7 @@ The package requires the following software:
     make
 
 In the case that compilation process encounters errors, please edit make.sys file. 
-For more information about installation please see user-guid.
+For more information about installation please see user-guide.
 
 ## About
 
