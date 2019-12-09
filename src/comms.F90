@@ -18,6 +18,7 @@
 ! with this program. If not, see http://www.gnu.org/licenses. 
 !######################################################################
 
+! this module was taken from Wannier90 and modified according to our purposes.
 
 module mc_comms
 

@@ -18,6 +18,8 @@
 ! with this program. If not, see http://www.gnu.org/licenses. 
 !######################################################################
 
+! some parts of this module were taken from Wannier90 and modified according to our purposes.
+
 module mc_utility
 
   use mc_constants, only : dp
