@@ -6,7 +6,7 @@ the Heisenberg exchange, bi-quadratic, Dzyaloshinskii-Moriya, and single-ion int
 Spin configurations can be updated through either local Metropolis updating or parallel tempering. 
 
 If you are using this software, please cite
-> Nfise Rezaei, Mojtaba Alaei, Hadi Akbarzadeh, ESpinS: A program for classical Monte-Carlo simulations of spin systems. 
+> Nafise Rezaei, Mojtaba Alaei, Hadi Akbarzadeh, ESpinS: A program for classical Monte-Carlo simulations of spin systems, [arXiv:1912.00793](https://arxiv.org/abs/1912.00793)
 
 
 ## Requirements
@@ -24,11 +24,11 @@ The package requires the following software:
     make
 
 In the case that compilation process encounters errors, please edit make.sys file. 
-For more information about installation please see user-guid.
+For more information about installation please see user-guide.
 
 ## About
 
-Created and maintained by Nafise Rezaei (Physics department, Isfahan University of Technology, Isfahan, Iran)
+Created and maintained by Nafise Rezaei (Physics Department, Isfahan University of Technology, Isfahan, Iran)
 
 With contributions by
-* Mojtaba Alaei (Physics department, Isfahan University of Technology, Isfahan, Iran)
+* Mojtaba Alaei (Physics Department, Isfahan University of Technology, Isfahan, Iran)
