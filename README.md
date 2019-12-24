@@ -1,6 +1,6 @@
 # ESpinS - Esfahan Spin Simulation package
 
-![alt text](https://github.com/nafiserb/ESpinS/tree/master/user-guide/images/logo.png)
+![alt text](user-guide/images/logo.png)
 
 Package for classical Monte-Carlo simulation of spin systems.
 In ESpinS, the spin model hamiltonian of a spin system can be defined through 
