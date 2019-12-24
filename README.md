@@ -1,5 +1,7 @@
 # ESpinS - Esfahan Spin Simulation package
 
+![logo](https://github.com/nafiserb/ESpinS/user-guide/images/logo.png)
+
 Package for classical Monte-Carlo simulation of spin systems.
 In ESpinS, the spin model hamiltonian of a spin system can be defined through 
 the Heisenberg exchange, bi-quadratic, Dzyaloshinskii-Moriya, and single-ion interactions. 
