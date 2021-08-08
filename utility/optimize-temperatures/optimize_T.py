@@ -1,5 +1,5 @@
-#In this program, we estimate temperatures in a way that 
-#the acceptance ratio in parallel tempering swapping becomes equal for all temperatures.
+# In this program, we estimate temperatures in a way that 
+# the acceptance ratio in parallel tempering swapping becomes equal for all temperatures.
 # We use the following paper for this purpose:
 # Koji Hukushima, Physical Review E, 60, 3606 
 # The program is written by Dr. Mojtaba Alaei.
