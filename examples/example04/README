@@ -1,6 +1,6 @@
 # The results of this example can be compared by results in the following paper: 
 # Origin of magnetic frustration in Bi3Mn4O12(NO3)
-# Physical Review B, 96, 140404 (R) (2017) 
+# Physical Review B, 96, 140404 (R) (2017) (DOI : https://doi.org/10.1103/PhysRevB.96.140404) 
 
 1) run 
    mc.x -inp1 bmno
