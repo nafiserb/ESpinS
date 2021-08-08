@@ -1,0 +1,17 @@
+ Begin Unit_Cell_Cart
+2.0000000 .0000000 .0000000
+.0000000 2.0000000 .0000000
+.0000000 .0000000 2.0000000
+ End Unit_Cell_Cart
+ 
+ Begin Atoms_Cart 
+  Ni  0.0000000  0.0000000 0.0000000  1
+ End Atoms_Cart
+
+ Shells_jij = 2
+
+ !! Length_unit     = Bohr
+ !! Parameter_unit  = Ryd
+ !! Coordinate      = Cart
+
+

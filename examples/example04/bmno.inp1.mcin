@@ -1,0 +1,22 @@
+ Begin Unit_Cell_Cart
+     4.96919766   0.00000000   0.00000000
+    -2.48459883   4.30345141   0.00000000
+     0.00000000   0.00000000  13.16269381
+ End Unit_Cell_Cart
+
+ Begin Atoms_Cart
+   Mn      2.4846013   1.4344824   0.0000000   1.0
+   Mn      2.4846013   1.4344824   4.9329477   1.0
+   Mn     -0.0000025   2.8689690   0.0000000   1.0
+   Mn     -0.0000025   2.8689690   4.9329477   1.0
+ End Atoms_Cart
+
+ Shells_jij     = 7 
+ !ham_bij        = T 
+ !Shells_bij     = 1 
+ !ham_dij        = T 
+ !Shells_dij     = 1 
+
+ !Length_unit      = Bohr
+ !Parameters_unit  = Ryd 
+ !Coordinate       = Cart 

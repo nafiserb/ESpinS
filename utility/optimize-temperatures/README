@@ -1,0 +1,51 @@
+The program optimizes temperatures to make the acceptance ratio of swapping, 
+in parallel tempering, becomes equal for all temperatures.
+
+We use the following paper for this purpose:
+Koji Hukushima, Physical Review E, 60, 3606 (DOI: https://doi.org/10.1103/PhysRevE.60.3606)
+
+
+
+The program needs python 3 and scientific python libraries: numpy, scipy and matplotlib.
+
+To use this program, run a short MC simulation (for example with 100000-200000 steps) 
+to obtain the energy of the system versus temperature.
+Extract data from *_mc.dat file using the following command:
+
+awk '{print $1,$3}' *_mc.dat > E.dat
+
+E.dat file contains two columns. The first column is temperatures and the second column is energies:
+
+
+1-To run the program, type:
+
+   python  optimize_T.py 
+
+   or
+
+   python optimize_T.py --data E.dat --alpha 0.9 --epsilon 1e-8
+
+2-The default name of data file is E.dat  
+
+3-To get help type:
+
+  python optimize_T.py -h  
+
+=========================================================================================
+
+In the case that this program doesn't work, use a program developed by Dr. Ruben Andrist:
+
+https://github.com/andrist/tempering
+
+The program works with the R language.
+To prepare the input file for the program type the following commands:
+
+   awk '{print $1,$3}' *_mc.dat  > E_andrist.dat 
+   sed -i '/#/d'  E_andrist.dat 
+   sed -i '1 i\T e' E_andrist.dat 
+
+
+Then run the following command:
+
+tempering.R  E_andrist.dat 
+
