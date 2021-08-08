@@ -36,7 +36,7 @@ module mc_io
 
   integer,            public, save :: stdout
   character(len=50),  public, save :: seedname
-  integer, parameter, public       :: maxlen = 500      ! Max column width of input file
+  integer, parameter, public       :: maxlen = 700      ! Max column width of input file
   logical,            public, save :: input1_file_flag  ! Set Input file processing from cmd line
   logical,            public, save :: input2_file_flag  ! Set Input file processing from cmd line
   logical,            public, save :: ham_file_flag     ! Set Hamiltonian file processing from cmd line

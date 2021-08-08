@@ -12,6 +12,7 @@
 \usepackage{pifont}
 \usepackage{adforn}
 \usepackage{braket}
+\usepackage{textcomp}  
 %\usepackage{amssymb} %
 %\usepackage{wasysym}%
 %\usepackage{adfbullets}
@@ -1235,6 +1236,78 @@ a python script to plot the neutron structure factor.
 \item {\tt seedname\_sf.gnu}\\\\    
  It will be created  if {\tt sfactor = .True.}, a gnuplot script to plot the neutron structure factor.
 \end{itemize}
+
+\section{Optimized temperatures}
+To have a more efficient parallel tempering simulation, it is better to optimize the temperature set.
+The {\tt optimize\_T.py} program in the utility/optimize-temperatures directory, 
+optimizes temperatures in a way that the acceptance ratio in parallel tempering swapping becomes equal for all temperatures.
+The program needs {\tt python3} and scientific python libraries: {\tt NumPy}, {\tt Scipy}, and {\tt Matplotlib}.
+To use this program, run a short MC simulation (for example, with 100000-200000 steps) to obtain the energies of the system for a range of temperatures. 
+Then, extract energies and temperatures data from {\tt seedname\_mc.dat} file.
+To extract data, you can use the following {\tt awk} command:
+
+\begin{itemize}
+\item {\tt awk \textquotesingle\{print \$1,\$3\}\textquotesingle $\,\,$   seedname\_mc.dat > E.dat}
+\end{itemize}
+
+The default name of the data file is {\tt E.dat}, and contains two columns. The first column is temperatures, and the second column is energies.\\
+
+To run the program, type:
+\begin{itemize}
+\item  {\tt python  optimize\_T.py}  \\
+\\
+   or
+\item  {\tt python optimize\_T.py --data E.dat --alpha 0.9 --epsilon 1e-8}
+\end{itemize}
+
+To get help type:
+\begin{itemize}
+\item {\tt python optimize\_T.py -h}
+\end{itemize}
+If there is a convergence problem, use a smaller mixing $\alpha$ parameter by {\tt --alpha} option in the command line.\\
+
+In the case that this program doesn't work, use a program developed by Dr. Ruben Andrist.
+The program can be downloaded from Github ({\tt https://github.com/andrist/tempering}).
+The program is written in the {\tt R} language. So you need to install the {\tt R} language.
+To prepare the input file for the program, type the following commands:
+
+\begin{itemize}
+\item  {\tt awk \textquotesingle\{print \$1,\$3\}\textquotesingle $\,\,$   seedname\_mc.dat  > E.dat}
+\item  {\tt sed -i \textquotesingle/\#/d\textquotesingle $\,\,$  E.dat }
+\item  {\tt sed -i \textquotesingle 1 i$\backslash$T e\textquotesingle  $\,\,$ E.dat}
+\end{itemize}
+
+Example of {\tt E.dat}  file for Andrist's code:
+{\scriptsize    
+\begin{verbatim}
+T e
+10.2857 -0.16536985E+03
+11.3333 -0.16428562E+03
+12.3810 -0.16319797E+03
+13.4286 -0.16210542E+03
+14.4762 -0.16100851E+03
+15.5238 -0.15990662E+03
+16.5714 -0.15880025E+03
+17.6190 -0.15768768E+03
+18.6667 -0.15657148E+03
+19.7143 -0.15544733E+03
+20.7619 -0.15431814E+03
+21.8095 -0.15318409E+03
+22.8571 -0.15204195E+03
+23.9048 -0.15089321E+03
+24.9524 -0.14973823E+03
+26.0000 -0.14857329E+03
+\end{verbatim}
+}
+
+Then run the following command:
+
+\begin{itemize}
+\item {\tt tempering.R  E.dat}
+\end{itemize}
+
+ 
+
 \chapter{Heisenberg Hamiltonian: {\tt -ham} command}
 \begin{center}
 \begin{tabular}{|c|p{10cm}|}
