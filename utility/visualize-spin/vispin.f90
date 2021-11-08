@@ -81,11 +81,11 @@ program visualize_spin
     stop 
   endif
 
-  allocate(spin(num_tems,num_supercell,3))
+  allocate(spin(num_tems,num_supercell*natoms_cell,3))
   allocate(tems(num_tems))
   do i=1,num_tems
      read(sconfigunit,*) tems(i) 
-     do j=1,num_supercell
+     do j=1,num_supercell*natoms_cell
         read(sconfigunit,*) spin(i,j,1),spin(i,j,2),spin(i,j,3)
      enddo
   enddo
