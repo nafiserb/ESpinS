@@ -4,7 +4,7 @@
 #=============                                             
 F90 = ifort
 COMMS=mpi
-MPIF90=mpifort
+MPIF90=mpiifort
 FCOPTS=-O2 
 LDOPTS=-O2 
 #========================================================
